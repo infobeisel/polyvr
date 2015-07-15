@@ -2,6 +2,7 @@
 #include "core/scene/VRScene.h"
 #include "VRPhysics.h"
 #include "core/objects/geometry/VRGeometry.h"
+#include "core/objects/geometry/VRStroke.h"
 #include "core/objects/geometry/VRConstraint.h"
 #include <OpenSG/OSGTriangleIterator.h>
 #include <BulletCollision/CollisionDispatch/btGhostObject.h>
@@ -10,6 +11,7 @@
 #include <BulletSoftBody/btSoftBodyHelpers.h>
 #include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
 
+#include "core/math/path.h"
 
 #include "core/objects/geometry/VRPrimitive.h"
 
@@ -403,7 +405,56 @@ btSoftBody* VRPhysics::createCloth() {
 
 
 btSoftBody* VRPhysics::createRope() {
-   return 0;
+   if ( !vr_obj->hasAttachment("geometry") ) { cout << "VRPhysics::createRope only works on geometries" << endl; return 0; }
+    OSG::VRStroke* geo = (OSG::VRStroke*)vr_obj;
+
+    OSG::Matrix m = vr_obj->getMatrix();//get Transformation
+    vr_obj->setOrientation(OSG::Vec3f(0,0,-1),OSG::Vec3f(0,1,0));//set orientation to identity. ugly solution.
+    vr_obj->setWorldPosition(OSG::Vec3f(0.0,0.0,0.0));
+    btSoftBodyWorldInfo* info = OSG::VRSceneManager::getCurrent()->getSoftBodyWorldInfo();
+
+    VRPlane* prim = (VRPlane*)geo->getPrimitive();
+    float nx = prim->Nx;
+    float ny = prim->Ny;
+    float h = prim->height;
+    float w = prim->width;
+
+    vector<OSG::path*>& paths = geo->getPaths();
+    vector<OSG::Vec3f> profile = geo->getProfile();
+
+    OSG::GeoVectorPropertyRecPtr positions = geo->getMesh()->getPositions();
+    vector<btVector3> vertices;
+    vector<btScalar> masses;
+
+    OSG::Pnt3f p;
+    for(int i = 0; i < positions->size();i++) { //add all vertices
+        positions->getValue(p,i);
+        m.mult(p,p);
+        vertices.push_back( toBtVector3(OSG::Vec3f(p)) );
+        masses.push_back(5.0);
+    }
+
+    btVector3* start = &vertices.front();
+    btScalar* startm = &masses.front();
+    btSoftBody* ret = new btSoftBody(info,(int)positions->size(),start,startm);
+
+    // add line
+    if (profile.size() == 1) {
+        int N = positions->size();
+        ret->appendLink(N-2,N-1);
+    } else {
+        // add quad
+        for (uint k=0; k<profile.size()-1; k++) {
+            int N1 = positions->size() - 2*profile.size() + k;
+            int N2 = positions->size() -   profile.size() + k;
+            1,2,2+1,
+            ret->appendFace(N1,N2,N2+1);
+            ret->appendFace(N2,N2+1,N1+1);
+            //cout << "\nN1N2 " << N1 << " " << N2 << " " << N2+1 << " " << N1+1 << flush;
+        }
+    }
+
+    return ret;//return the first and only plane....
 }
 
 

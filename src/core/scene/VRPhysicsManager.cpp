@@ -210,8 +210,7 @@ void VRPhysicsManager::updatePhysObjects() {
             visualgeo->setIndices(visualinds);
             visualgeo->setNormals(visualnorms);
 
-            if(geo->getPrimitive()->getType() == "Plane") { //only for plane soft bodies : directly apply nodes to vertices of geometry model
-                VRPlane* prim = (VRPlane*)geo->getPrimitive();
+            if(geo->getPrimitive()->getType() == "Plane" || soft_trans->getPhysics()->getShape() == "Rope") { //only for plane/ropes soft bodies : directly apply nodes to vertices of geometry model
                 GeoPnt3fPropertyRecPtr positions = GeoPnt3fProperty::create();
                 GeoVec3fPropertyRecPtr norms = GeoVec3fProperty::create();
                 GeoUInt32PropertyRecPtr inds = GeoUInt32Property::create();
@@ -224,11 +223,6 @@ void VRPhysicsManager::updatePhysObjects() {
                 geo->setPositions(positions);
                 geo->setNormals(norms);
            }
-
-        /*   if(soft_trans->getPhysics()->getShape() == "Rope") { //only for Ropes
-
-            }*/
-
         }
     }
 

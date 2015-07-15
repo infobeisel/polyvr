@@ -29,6 +29,7 @@ void VRStroke::setPaths(vector<path*> p) {
 }
 
 vector<path*>& VRStroke::getPaths() { return paths; }
+vector<Vec3f> VRStroke::getProfile() { return profile; }
 
 /*void VRStroke::addQuad(GeoPnt3fPropertyRecPtr Pos, vector<Vec3f>& profile, GeoUInt32PropertyRecPtr Indices) {
     ;
