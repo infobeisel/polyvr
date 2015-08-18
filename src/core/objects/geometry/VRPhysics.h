@@ -66,6 +66,8 @@ class VRPhysics : public OSG::VRStorage {
         btVector3 constantForce;
         btVector3 constantTorque;
 
+
+
         OSG::VRTransform* vr_obj = 0;
         OSG::VRConstraint* constraint = 0;
         OSG::Vec3f scale;
@@ -134,6 +136,10 @@ class VRPhysics : public OSG::VRStorage {
         /** requests a force, which is handled in the physics thread later**/
         void addForce(OSG::Vec3f i);
         void addTorque(OSG::Vec3f i);
+
+        /** wind **/
+        void addAeroForceToNode(OSG::Vec3f* windVelocity,int nodeIndex);
+        void addAeroForceToFace(OSG::Vec3f* windVelocity,int faceIndex);
 
         void addConstantForce(OSG::Vec3f i);
         void addConstantTorque(OSG::Vec3f i);

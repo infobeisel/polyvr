@@ -136,6 +136,10 @@ void VRPhysics::setDamping(float lin, float ang) { linDamping = lin; angDamping 
 OSG::Vec3f VRPhysics::getForce() { Lock lock(mtx()); return toVec3f(constantForce); }
 OSG::Vec3f VRPhysics::getTorque() { Lock lock(mtx()); return toVec3f(constantTorque); }
 
+
+void VRPhysics::addAeroForceToNode(OSG::Vec3f* windVelocity,int nodeIndex) {if(soft_body == 0) return; soft_body->addAeroForceToNode(toBtVector3(*windVelocity),nodeIndex);}
+void VRPhysics::addAeroForceToFace(OSG::Vec3f* windVelocity,int faceIndex) {if(soft_body == 0) return; soft_body->addAeroForceToFace(toBtVector3(*windVelocity),faceIndex);}
+
 void VRPhysics::prepareStep() {
     if(soft) return;
     if(body == 0) return;
