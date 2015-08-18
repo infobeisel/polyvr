@@ -36,6 +36,7 @@ struct VRPyTransform : VRPyBaseT<OSG::VRTransform> {
     static PyObject* setGhost(VRPyTransform* self, PyObject *args);
     static PyObject* setPhysicsConstraintTo(VRPyTransform* self, PyObject *args);
     static PyObject* setMass(VRPyTransform* self, PyObject *args);
+    static PyObject* setNodeWeights(VRPyTransform* self, PyObject *args);
     static PyObject* setGravity(VRPyTransform* self, PyObject *args);
     static PyObject* setCollisionMargin(VRPyTransform* self, PyObject *args);
     static PyObject* setCollisionGroup(VRPyTransform* self, PyObject *args);

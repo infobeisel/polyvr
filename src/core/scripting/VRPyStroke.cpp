@@ -163,6 +163,7 @@ PyObject* VRPyStroke::update(VRPyStroke* self) {
 PyObject* VRPyStroke::convertToRope(VRPyStroke* self) {
     if (self->obj == 0) { PyErr_SetString(err, "VRPyStroke::convertToRope: C Object is invalid"); return NULL; }
     self->obj->getPhysics()->setDynamic(true);
+    self->obj->getPhysics()->setCollisionMargin(0.0);
     self->obj->getPhysics()->setShape("Rope");
     self->obj->getPhysics()->setSoft(true);
     self->obj->getPhysics()->setPhysicalized(true);

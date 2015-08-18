@@ -342,6 +342,18 @@ void VRPhysics::update() {
     updateConstraints();
 }
 
+void VRPhysics::setNodeWeights(vector<float> *weights) {
+    if(soft_body == 0) return;
+    btSoftBody::tNodeArray&   nodes(soft_body->m_nodes);
+    int i = 0;
+    while (i < weights->size()) {
+        nodes[i].m_im = 1.0f/weights->at(i);
+        i++;
+    }
+    for (int j = i; j < nodes.size(); j++) nodes[j].m_im = 1.0f/weights->at(i-1);
+}
+
+
 btSoftBody* VRPhysics::createCloth() {
     if ( !vr_obj->hasAttachment("geometry") ) { cout << "VRPhysics::createCloth only works on geometries" << endl; return 0; }
     OSG::VRGeometry* geo = (OSG::VRGeometry*)vr_obj;
@@ -367,7 +379,7 @@ btSoftBody* VRPhysics::createCloth() {
         positions->getValue(p,i);
         m.mult(p,p);
         vertices.push_back( toBtVector3(OSG::Vec3f(p)) );
-        masses.push_back(5.0);
+        masses.push_back(1.0);
     }
 
     btVector3* start = &vertices.front();
@@ -431,7 +443,7 @@ btSoftBody* VRPhysics::createRope() {
         positions->getValue(p,i);
         m.mult(p,p);
         vertices.push_back( toBtVector3(OSG::Vec3f(p)) );
-        masses.push_back(5.0);
+        masses.push_back(1.0);
     }
 
     btVector3* start = &vertices.front();
@@ -453,6 +465,7 @@ btSoftBody* VRPhysics::createRope() {
             //cout << "\nN1N2 " << N1 << " " << N2 << " " << N2+1 << " " << N1+1 << flush;
         }
     }
+
 
     return ret;//return the first and only plane....
 }

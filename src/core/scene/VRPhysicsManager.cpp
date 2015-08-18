@@ -163,21 +163,23 @@ void VRPhysicsManager::updatePhysObjects() {
     btSoftBodyArray arr = dynamicsWorld->getSoftBodyArray();
     //Patches
     VRTransform* soft_trans;
-    btSoftBody* patch;
+    btSoftBody* softbody;
     for(int i = 0; i < arr.size() ;i++) { //for all soft bodies
         soft_trans = OSGobjs[arr[i]]; //get the corresponding transform to this soft body
         if (soft_trans == 0) continue;
-        patch = arr[i]; //the soft body
-        if (soft_trans->getType() == "Sprite") {
+        softbody = arr[i]; //the soft body
+        if(soft_trans->getPhysics()->getShape() == "Cloth" || soft_trans->getPhysics()->getShape() == "Rope") { //only for plane/ropes soft bodies : directly apply nodes to vertices of geometry model
             OSG::VRGeometry* geo = (OSG::VRGeometry*)soft_trans;
-            OSG::VRGeometry* visualgeo = physics_visuals[patch]; //render the visual
 
-            btSoftBody::tNodeArray&   nodes(patch->m_nodes);
-            btSoftBody::tFaceArray&   faces(patch->m_faces);
-            btSoftBody::tLinkArray&   links(patch->m_links);
+            btSoftBody::tNodeArray&   nodes(softbody->m_nodes);
+            btSoftBody::tFaceArray&   faces(softbody->m_faces);
+            btSoftBody::tLinkArray&   links(softbody->m_links);
             GeoPnt3fPropertyRecPtr visualpos = GeoPnt3fProperty::create();
             GeoUInt32PropertyRecPtr visualinds = GeoUInt32Property::create();
             GeoVec3fPropertyRecPtr visualnorms = GeoVec3fProperty::create();
+
+            /* soft body visuals
+            OSG::VRGeometry* visualgeo = physics_visuals[softbody]; //render the visual
 
             for (unsigned int i = 0; i<nodes.size(); i++) { //go through the nodes and copy positions to mesh positionarray
                     Vec3f p = VRPhysics::toVec3f(nodes[i].m_x);
@@ -209,20 +211,18 @@ void VRPhysicsManager::updatePhysObjects() {
             visualgeo->setPositions(visualpos);
             visualgeo->setIndices(visualinds);
             visualgeo->setNormals(visualnorms);
-
-            if(geo->getPrimitive()->getType() == "Plane" || soft_trans->getPhysics()->getShape() == "Rope") { //only for plane/ropes soft bodies : directly apply nodes to vertices of geometry model
-                GeoPnt3fPropertyRecPtr positions = GeoPnt3fProperty::create();
-                GeoVec3fPropertyRecPtr norms = GeoVec3fProperty::create();
-                GeoUInt32PropertyRecPtr inds = GeoUInt32Property::create();
-                for (unsigned int i = 0; i<nodes.size(); i++) { //go through the nodes and copy positions to mesh positionarray
-                    Vec3f p = VRPhysics::toVec3f(nodes[i].m_x);
-                    positions->addValue(p);
-                    Vec3f n = VRPhysics::toVec3f(nodes[i].m_n);
-                    norms->addValue( n );
-                }
-                geo->setPositions(positions);
-                geo->setNormals(norms);
-           }
+            */
+            GeoPnt3fPropertyRecPtr positions = GeoPnt3fProperty::create();
+            GeoVec3fPropertyRecPtr norms = GeoVec3fProperty::create();
+            GeoUInt32PropertyRecPtr inds = GeoUInt32Property::create();
+            for (unsigned int i = 0; i<nodes.size(); i++) { //go through the nodes and copy positions to mesh positionarray
+                Vec3f p = VRPhysics::toVec3f(nodes[i].m_x);
+                positions->addValue(p);
+                Vec3f n = VRPhysics::toVec3f(nodes[i].m_n);
+                norms->addValue( n );
+            }
+            geo->setPositions(positions);
+            geo->setNormals(norms);
         }
     }
 

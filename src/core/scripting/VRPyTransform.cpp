@@ -81,9 +81,10 @@ PyMethodDef VRPyTransform::methods[] = {
     {"setRotationConstraints", (PyCFunction)VRPyTransform::setRotationConstraints, METH_VARARGS, "Constraint the object's rotation - setRotationConstraints(xi, yi, zi)" },
     {"physicalize", (PyCFunction)VRPyTransform::physicalize, METH_VARARGS, "physicalize subtree - physicalize( physicalized , dynamic , concave )" },
     {"setGhost", (PyCFunction)VRPyTransform::setGhost, METH_VARARGS, "Set the physics object to be a ghost object - setGhost(bool)" },
-    {"attach", (PyCFunction)VRPyTransform::setPhysicsConstraintTo, METH_VARARGS, "create a constraint between this object and another - attach( Transform , Constraint, Spring ), or if this is soft, the args have to be: RigidBody other, int nodeIndex, localpivotX,localpivotY,localpivotZ, bool ignoreCollision, float influenceVRPyTransform *t;" },
+    {"attach", (PyCFunction)VRPyTransform::setPhysicsConstraintTo, METH_VARARGS, "create a constraint between this object and another - attach( Transform , Constraint, Spring ), or if this is soft, the args have to be: RigidBody other, int nodeIndex, localpivotX,localpivotY,localpivotZ, bool ignoreCollision, float influence" },
     {"detach", (PyCFunction)VRPyTransform::deletePhysicsConstraints, METH_VARARGS, "delete constraint made to this transform with given transform through attach(toTransform). Example call : trans1.detach(trans2)" },
     {"setMass", (PyCFunction)VRPyTransform::setMass, METH_VARARGS, "Set the mass of the physics object" },
+    {"setNodeWeights", (PyCFunction)VRPyTransform::setNodeWeights, METH_VARARGS, "set the inverted masses for each node of this SOFTbody physics object. this.setNodeWeights([3.0,4.0,...])" },
     {"setCollisionMargin", (PyCFunction)VRPyTransform::setCollisionMargin, METH_VARARGS, "Set the collision margin of the physics object" },
     {"setCollisionGroup", (PyCFunction)VRPyTransform::setCollisionGroup, METH_VARARGS, "Set the collision group of the physics object" },
     {"setCollisionMask", (PyCFunction)VRPyTransform::setCollisionMask, METH_VARARGS, "Set the collision mask of the physics object" },
@@ -343,8 +344,8 @@ PyObject* VRPyTransform::physicalize(VRPyTransform* self, PyObject *args) {
 
 PyObject* VRPyTransform::setPhysicsConstraintTo(VRPyTransform* self, PyObject *args) {
     //if this is soft, the args have to be: RigidBody other, int nodeIndex, vec3 localpivot, bool ignoreCollision, float influence
-    VRPyTransform *t;
     if(self->obj->getPhysics()->isSoft()) {
+        VRPyTransform *t;
         int nodeIndex;
         int ignoreCollision;
         float influence;
@@ -353,6 +354,7 @@ PyObject* VRPyTransform::setPhysicsConstraintTo(VRPyTransform* self, PyObject *a
         float localPivZ;
         if (! PyArg_ParseTuple(args, "Oifffif", &t, &nodeIndex,&localPivX,&localPivY,&localPivZ, &ignoreCollision, &influence)) return NULL;
         self->obj->getPhysics()->setConstraint(t->obj->getPhysics(),nodeIndex,OSG::Vec3f(localPivX,localPivY,localPivZ),ignoreCollision,influence);
+    cout << "is soft"<<endl;
     }
     else {
         VRPyTransform *t; VRPyConstraint *c; VRPyConstraint *cs;
@@ -367,6 +369,15 @@ PyObject* VRPyTransform::setMass(VRPyTransform* self, PyObject *args) {
     float f = parseFloat(args);
     if (self->obj == 0) { PyErr_SetString(err, "VRPyTransform::setMass: C Object is invalid"); return NULL; }
     self->obj->getPhysics()->setMass(f);
+    Py_RETURN_TRUE;
+}
+
+PyObject* VRPyTransform::setNodeWeights(VRPyTransform* self, PyObject *args) {
+    vector<PyObject*> pies = parseList(args);
+    vector<float> ws;
+    for(PyObject* pie : pies) ws.push_back((float)PyFloat_AsDouble(pie));
+    if (self->obj == 0) { PyErr_SetString(err, "VRPyTransform::setNodeWeights: C Object is invalid"); return NULL; }
+    self->obj->getPhysics()->setNodeWeights(&ws);
     Py_RETURN_TRUE;
 }
 

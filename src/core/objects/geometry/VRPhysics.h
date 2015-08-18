@@ -107,6 +107,7 @@ class VRPhysics : public OSG::VRStorage {
         bool isGhost();
         void setSoft(bool b);
         bool isSoft();
+        void setNodeWeights(vector<float> *weights);
 
         void setMass(float m);
         float getMass();

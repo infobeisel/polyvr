@@ -54,7 +54,7 @@ PyMethodDef VRPySprite::methods[] = {
     {"setText", (PyCFunction)VRPySprite::setText, METH_VARARGS, "Set label text from sprite." },
     {"setSize", (PyCFunction)VRPySprite::setSize, METH_VARARGS, "Set sprite size." },
     {"webOpen", (PyCFunction)VRPySprite::webOpen, METH_VARARGS, "Open and display a website - webOpen(str uri, int width, flt ratio)" },
-    {"convertToCloth", (PyCFunction)VRPySprite::convertToCloth, METH_VARARGS, "convert this Sprite to cloth (softbody)" },
+    {"convertToCloth", (PyCFunction)VRPySprite::convertToCloth, METH_VARARGS, "convert this Sprite to cloth (softbody) with given list of node weights. last weight in list will be applied to all further nodes (if |nodes| > |givenlist|) ,this.convertToCloth([0.1,0.4,...])" },
     {NULL}  /* Sentinel */
 };
 
