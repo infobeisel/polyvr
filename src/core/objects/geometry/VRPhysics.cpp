@@ -137,8 +137,7 @@ OSG::Vec3f VRPhysics::getForce() { Lock lock(mtx()); return toVec3f(constantForc
 OSG::Vec3f VRPhysics::getTorque() { Lock lock(mtx()); return toVec3f(constantTorque); }
 
 
-void VRPhysics::addAeroForceToNode(OSG::Vec3f* windVelocity,int nodeIndex) {if(soft_body == 0) return; soft_body->addAeroForceToNode(toBtVector3(*windVelocity),nodeIndex);}
-void VRPhysics::addAeroForceToFace(OSG::Vec3f* windVelocity,int faceIndex) {if(soft_body == 0) return; soft_body->addAeroForceToFace(toBtVector3(*windVelocity),faceIndex);}
+void VRPhysics::setWindVelocity(OSG::Vec3f* windVelocity) {if(soft_body == 0) return;Lock lock(mtx()); soft_body->setWindVelocity(toBtVector3(*windVelocity));}
 
 void VRPhysics::prepareStep() {
     if(soft) return;
@@ -348,13 +347,14 @@ void VRPhysics::update() {
 
 void VRPhysics::setNodeWeights(vector<float> *weights) {
     if(soft_body == 0) return;
-    btSoftBody::tNodeArray&   nodes(soft_body->m_nodes);
+    btSoftBody::tNodeArray*   nodes = &(soft_body->m_nodes);
     int i = 0;
     while (i < weights->size()) {
-        nodes[i].m_im = 1.0f/weights->at(i);
+        nodes->at(i).m_im = 1.0f/weights->at(i);
         i++;
     }
-    for (int j = i; j < nodes.size(); j++) nodes[j].m_im = 1.0f/weights->at(i-1);
+    for (int j = i; j < nodes->size(); j++) nodes->at(j).m_im = 1.0f/weights->at(i-1);
+    soft_body->updateLinkConstants();
 }
 
 
@@ -415,6 +415,14 @@ btSoftBody* VRPhysics::createCloth() {
        }
    }
 #undef IDX
+
+    //hardcode configuration of this cloth:
+    //aerodynamics: configure drag and lift coefficent, aeromodel
+    ret->m_cfg.kLF = 0.004;
+    ret->m_cfg.kDG = 0.0003;
+    //ret->m_kLST = 0.0004;
+    ret->m_cfg.aeromodel = btSoftBody::eAeroModel::V_TwoSided;
+
 
     return ret;//return the first and only plane....
 }

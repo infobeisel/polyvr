@@ -50,8 +50,7 @@ struct VRPyTransform : VRPyBaseT<OSG::VRTransform> {
     static PyObject* applyTorque(VRPyTransform* self, PyObject *args);
     static PyObject* applyConstantForce(VRPyTransform* self, PyObject *args);
     static PyObject* applyConstantTorque(VRPyTransform* self, PyObject *args);
-    static PyObject* addAeroForceToNode(VRPyTransform* self, PyObject *args);
-    static PyObject* addAeroForceToFace(VRPyTransform* self, PyObject *args);
+    static PyObject* setWindVelocity(VRPyTransform* self, PyObject *args);
     static PyObject* getForce(VRPyTransform* self);
     static PyObject* getTorque(VRPyTransform* self);
     static PyObject* getConstraintAngleWith(VRPyTransform* self, PyObject *args);

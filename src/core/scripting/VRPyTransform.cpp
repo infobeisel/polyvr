@@ -96,8 +96,7 @@ PyMethodDef VRPyTransform::methods[] = {
     {"applyTorque", (PyCFunction)VRPyTransform::applyTorque, METH_VARARGS, "Apply torque on the physics object  (e.g. obj.applyTorque(1.0,0.0,0.0) )" },
     {"applyConstantForce", (PyCFunction)VRPyTransform::applyConstantForce, METH_VARARGS, "Apply a constant force on the physics object (e.g. obj.applyConstantForce(1.0,0.0,0.0) )" },
     {"applyConstantTorque", (PyCFunction)VRPyTransform::applyConstantTorque, METH_VARARGS, "Apply a constant torque on the physics object  (e.g. obj.applyConstantTorque(1.0,0.0,0.0) )" },
-    {"addAeroForceToNode", (PyCFunction)VRPyTransform::addAeroForceToNode, METH_VARARGS, "add wind to this SOFTbody at given nodeindex: this.addAeroForceToNode(vecx,vecy,vecz,nodeindex)" },
-    {"addAeroForceToFace", (PyCFunction)VRPyTransform::addAeroForceToFace, METH_VARARGS, "add wind to this SOFTbody at given faceindex: this.addAeroForceToFace(vecx,vecy,vecz,faceindex)" },
+    {"setWindVelocity", (PyCFunction)VRPyTransform::setWindVelocity, METH_VARARGS, "this.setWindVelocity(vecx,vecy,vecz)" },
     {"getForce", (PyCFunction)VRPyTransform::getForce, METH_NOARGS, "get the total force put on this transform during this frame. returns 3-Tuple" },
     {"getTorque", (PyCFunction)VRPyTransform::getTorque, METH_NOARGS, "get the total torque put on this transform during this frame. returns 3-Tuple" },
     {"setPhysicsActivationMode", (PyCFunction)VRPyTransform::setPhysicsActivationMode, METH_VARARGS, "Set the physics activation mode of the physics object (normal:1 , no deactivation:4, stay deactivated: 5)" },
@@ -463,23 +462,13 @@ PyObject* VRPyTransform::applyConstantTorque(VRPyTransform* self, PyObject *args
     Py_RETURN_TRUE;
 }
 
-PyObject* VRPyTransform::addAeroForceToFace(VRPyTransform* self, PyObject *args) {
-    float x,y,z;
-    int i;
-    if (! PyArg_ParseTuple(args, "fffi", &x, &y, &z, &i)) return NULL;
-    if (self->obj == 0) { PyErr_SetString(err, "VRPyTransform::applyConstantTorque: C Object is invalid"); return NULL; }
-    OSG::Vec3f wind = OSG::Vec3f(x,y,z);
-    self->obj->getPhysics()->addAeroForceToFace(&wind,i);
-    Py_RETURN_TRUE;
-}
 
-PyObject* VRPyTransform::addAeroForceToNode(VRPyTransform* self, PyObject *args) {
+PyObject* VRPyTransform::setWindVelocity(VRPyTransform* self, PyObject *args) {
     float x,y,z;
-    int i;
-    if (! PyArg_ParseTuple(args, "fffi", &x, &y, &z, &i)) return NULL;
+    if (! PyArg_ParseTuple(args, "fff", &x, &y, &z)) return NULL;
     if (self->obj == 0) { PyErr_SetString(err, "VRPyTransform::applyConstantTorque: C Object is invalid"); return NULL; }
     OSG::Vec3f wind = OSG::Vec3f(x,y,z);
-    self->obj->getPhysics()->addAeroForceToNode(&wind,i);
+    self->obj->getPhysics()->setWindVelocity(&wind);
     Py_RETURN_TRUE;
 }
 

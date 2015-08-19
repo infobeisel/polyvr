@@ -138,8 +138,7 @@ class VRPhysics : public OSG::VRStorage {
         void addTorque(OSG::Vec3f i);
 
         /** wind **/
-        void addAeroForceToNode(OSG::Vec3f* windVelocity,int nodeIndex);
-        void addAeroForceToFace(OSG::Vec3f* windVelocity,int faceIndex);
+        void setWindVelocity(OSG::Vec3f* windVelocity);
 
         void addConstantForce(OSG::Vec3f i);
         void addConstantTorque(OSG::Vec3f i);

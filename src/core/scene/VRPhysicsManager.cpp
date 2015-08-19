@@ -54,9 +54,9 @@ VRPhysicsManager::VRPhysicsManager() {
    	softBodyWorldInfo->m_broadphase = broadphase;
 	softBodyWorldInfo->m_gravity.setValue(0,-10,0);
     softBodyWorldInfo->air_density	= (btScalar)1.2;
-    softBodyWorldInfo->water_density	= 0;
-    softBodyWorldInfo->water_offset	= 0;
-    softBodyWorldInfo->water_normal	= btVector3(0,0,0);
+    softBodyWorldInfo->water_density	= (btScalar)10;
+    softBodyWorldInfo->water_offset	= 4;
+    softBodyWorldInfo->water_normal	= btVector3(0,1,0);
 
 
     updatePhysObjectsFkt = new VRFunction<int>("Physics object update", boost::bind(&VRPhysicsManager::updatePhysObjects, this));
